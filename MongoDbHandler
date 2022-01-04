@@ -1,0 +1,38 @@
+import logging
+from pymongo import MongoClient
+from bson import InvalidDocument
+
+class MongoDbHandler(logging.Handler):
+
+    def __init__(self, db='Mongo_log', collection='log', id=None, pw=None, 
+                  host='localhost', port=27017, authSource='admin', 
+                  authMechanism='SCRAM-SHA-256', level=logging.NOTSET):
+        
+        logging.Handler.__init__(self, level)
+        client = MongoClient(host,
+                             username=id,
+                             password=pw,
+                             port = port,
+                             authSource= authSource,
+                             authMechanism=authMechanism)
+        log_db = client[db]
+        self.collection = log_db[collection]
+
+    def emit(self, record):
+        data = record.__dict__.copy()
+
+        try:
+            self.collection.insert_one(data)
+        except InvalidDocument as e:
+            logging.error("Unable save log to mongodb: %s", e.message)
+
+
+if __name__ == '__main__':
+    logger = logging.getLogger('mongoTest')
+    logger.setLevel(logging.WARNING)
+    logger.addHandler(MongoHandler(db='mongo_test',host='localhost', collection='test_log'))
+    logger.debug("test debug")
+    logger.info("test info")
+    logger.warning("test warning")
+    logger.error("test error")
+    logger.critical("test critical")
