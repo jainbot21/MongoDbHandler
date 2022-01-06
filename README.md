@@ -6,6 +6,6 @@
 ##### If you don't want to be logging levename of 'critical', you can use following. But you won't be able to find the actual error content.
 ```python    
 except InvalidDocument:
-          data['msg'] = str(data['msg']).replace(':','')
-          self.collection.insert_one(data)
+    data['msg'] = str(data['msg']).replace(':','')
+    self.collection.insert_one(data)
 ```
